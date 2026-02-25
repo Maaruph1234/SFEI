@@ -5,141 +5,443 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smiling Faces Empowerment Initiative</title>
   <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="font-sans text-gray-800 bg-gray-50">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --blue: #1E3A8A; --teal: #14B8A6; --gold: #FBBF24; }
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    html { scroll-behavior: smooth; }
 
-  <!-- Navbar -->
-  <header class="bg-white shadow sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-blue-600">SFEI</h1>
-      <nav class="space-x-6 hidden md:flex">
-        <a href="#" class="hover:text-blue-600">Home</a>
-        <a href="#" class="hover:text-blue-600">About</a>
-        <a href="#" class="hover:text-blue-600">Projects</a>
-        <a href="#" class="hover:text-blue-600">Team</a>
-        <a href="#" class="hover:text-blue-600">Get Involved</a>
-        <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Donate</a>
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: var(--teal); transition: width 0.3s ease; }
+    .nav-link:hover::after { width: 100%; }
+
+    .project-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .project-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(30,58,138,0.15); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.8s ease forwards; }
+
+    #mobileMenu { display: none; }
+    #mobileMenu.open { display: block; }
+
+    /* SLIDER */
+    .slider-wrapper { overflow: hidden; }
+    .slider-track { display: flex; gap: 1.5rem; transition: transform 0.5s cubic-bezier(.4,0,.2,1); }
+    .slide-card { min-width: calc(33.333% - 1rem); flex-shrink: 0; }
+    @media (max-width: 768px) { .slide-card { min-width: 100%; } }
+    @media (min-width: 769px) and (max-width: 1023px) { .slide-card { min-width: calc(50% - 0.75rem); } }
+
+    /* DONATE BUBBLE */
+    .donate-bubble-btn {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      background: var(--gold); color: #1E3A8A; border: none;
+      border-radius: 50px; padding: 0.85rem 1.5rem; font-weight: 700;
+      font-size: 0.95rem; cursor: pointer;
+      box-shadow: 0 8px 30px rgba(251,191,36,0.5);
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: pulse 2.5s infinite;
+    }
+    .donate-bubble-btn:hover { transform: scale(1.07); }
+    @keyframes pulse { 0%,100% { box-shadow: 0 8px 25px rgba(251,191,36,0.5); } 50% { box-shadow: 0 8px 45px rgba(251,191,36,0.8); } }
+
+    .donate-popup {
+      position: fixed; bottom: 6rem; right: 2rem; z-index: 1000;
+      background: white; border-radius: 1.25rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2); width: 320px;
+      overflow: hidden; transform: translateY(20px) scale(0.95);
+      opacity: 0; pointer-events: none;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .donate-popup.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+    /* TIMELINE */
+    .tl-item { position: relative; padding-left: 4.5rem; padding-bottom: 2.5rem; }
+    .tl-item::before { content: ''; position: absolute; left: 1.9rem; top: 3.5rem; bottom: 0; width: 2px; background: #e2e8f0; }
+    .tl-item:last-child::before { display: none; }
+    .tl-dot { position: absolute; left: 0; top: 0; width: 3.8rem; height: 3.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+  </style>
+</head>
+<body class="text-gray-800 bg-gray-50">
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <img src="images/logo.png" alt="SFEI Logo" class="h-12 object-contain" onerror="this.style.display='none'">
+        <div>
+          <p class="text-xs text-gray-500 leading-none">Smiling Faces</p>
+          <h1 class="text-xl font-bold" style="color:var(--blue);">Empowerment Initiative</h1>
+        </div>
+      </div>
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="#home" class="nav-link text-gray-700 font-medium text-sm">Home</a>
+        <a href="#about" class="nav-link text-gray-700 font-medium text-sm">About</a>
+        <a href="#projects" class="nav-link text-gray-700 font-medium text-sm">Projects</a>
+        <a href="team.html" class="nav-link text-gray-700 font-medium text-sm">Team</a>
+        <a href="#timeline" class="nav-link text-gray-700 font-medium text-sm">2025 Plan</a>
+        <a href="#get-involved" class="nav-link text-gray-700 font-medium text-sm">Get Involved</a>
+        <a href="#contact" class="nav-link text-gray-700 font-medium text-sm">Contact</a>
       </nav>
+      <button class="md:hidden text-blue-800" onclick="toggleMenu()">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="md:hidden bg-white border-t px-6 py-4 space-y-3">
+      <a href="#home" onclick="toggleMenu()" class="block text-gray-700 font-medium">Home</a>
+      <a href="#about" onclick="toggleMenu()" class="block text-gray-700 font-medium">About</a>
+      <a href="#projects" onclick="toggleMenu()" class="block text-gray-700 font-medium">Projects</a>
+      <a href="team.html" onclick="toggleMenu()" class="block text-gray-700 font-medium">Team</a>
+      <a href="#timeline" onclick="toggleMenu()" class="block text-gray-700 font-medium">2025 Plan</a>
+      <a href="#get-involved" onclick="toggleMenu()" class="block text-gray-700 font-medium">Get Involved</a>
+      <a href="#contact" onclick="toggleMenu()" class="block text-gray-700 font-medium">Contact</a>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="bg-cover bg-center h-[80vh] flex items-center justify-center text-center" style="background-image: url('images/IMG_1288.JPG');">
-    <div class="bg-black bg-opacity-60 text-white p-8 rounded">
-      <h2 class="text-4xl md:text-5xl font-bold mb-4">Empower. Educate. Uplift.</h2>
-      <p class="mb-6 text-lg">Changing lives one project at a time.</p>
-      <div class="space-x-4">
-        <a href="#" class="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500">See Our Work</a>
-        <a href="#" class="bg-white text-blue-700 px-4 py-2 rounded hover:bg-blue-100">Donate Now</a>
+  <!-- HERO -->
+  <section id="home" class="bg-cover bg-center min-h-[90vh] flex items-center justify-center text-center relative" style="background-image:url('images/bg-sc.JPG');">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/70 to-blue-900/70"></div>
+    <div class="relative z-10 text-white px-6 max-w-3xl fade-up">
+      <p class="text-sm uppercase tracking-[4px] mb-4" style="color:var(--gold);">Empowering Communities Since 2019</p>
+      <h2 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">Empower.<br/>Educate. Uplift.</h2>
+      <p class="text-lg text-gray-200 mb-8 leading-relaxed">Bridging generous hearts with communities in need — through food, water, green living, and disability support across Nigeria.</p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="#projects" class="px-7 py-3 rounded-full font-semibold text-blue-900 transition hover:scale-105" style="background:var(--gold);">See Our Work</a>
+        <a href="#work" class="px-7 py-3 rounded-full font-semibold border-2 border-white text-white hover:bg-white hover:text-blue-900 transition">Our Impact</a>
       </div>
     </div>
   </section>
 
-  <!-- Impact Stats -->
-  <section class="py-12 bg-white">
-    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-      <div>
-        <h3 class="text-3xl font-bold text-blue-600">5,000+</h3>
-        <p class="text-gray-600">Meals Served</p>
-      </div>
-      <div>
-        <h3 class="text-3xl font-bold text-green-600">800+</h3>
-        <p class="text-gray-600">Trees Planted</p>
-      </div>
-      <div>
-        <h3 class="text-3xl font-bold text-yellow-600">1,200+</h3>
-        <p class="text-gray-600">Lives Touched</p>
+  <!-- STATS -->
+  <section class="py-14" style="background:var(--blue);">
+    <div class="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+      <div><h3 class="text-4xl font-bold" style="color:var(--gold);">5,000+</h3><p class="text-blue-200 mt-1">Meals Served</p></div>
+      <div><h3 class="text-4xl font-bold" style="color:var(--gold);">800+</h3><p class="text-blue-200 mt-1">Trees Planted</p></div>
+      <div><h3 class="text-4xl font-bold" style="color:var(--gold);">1,200+</h3><p class="text-blue-200 mt-1">Lives Touched</p></div>
+      <div><h3 class="text-4xl font-bold" style="color:var(--gold);">10+</h3><p class="text-blue-200 mt-1">Communities Reached</p></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="py-20 bg-white">
+    <div class="container mx-auto px-6 flex flex-col md:flex-row gap-12 items-center">
+      <div class="md:w-1/2"><img src="images/IMG_2.JPG" alt="About SFEI" class="rounded-2xl shadow-xl w-full h-80 object-cover"></div>
+      <div class="md:w-1/2">
+        <p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color:var(--teal);">Who We Are</p>
+        <h2 class="text-4xl font-bold mb-5" style="color:var(--blue);">Making Change,<br/>One Life at a Time</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">Since 2019, Smiling Faces Empowerment Initiative has been a beacon of hope for underserved communities across Nigeria. We connect passionate donors with people who need it most.</p>
+        <p class="text-gray-600 leading-relaxed mb-6">From feeding the hungry and supporting persons with disabilities, to planting trees and providing clean water — every project we run is driven by love, dignity, and impact.</p>
+        <div class="flex gap-4">
+          <div class="text-center px-4 py-3 rounded-xl" style="background:#EFF6FF;"><p class="text-2xl font-bold" style="color:var(--blue);">6+</p><p class="text-xs text-gray-500">Years Active</p></div>
+          <div class="text-center px-4 py-3 rounded-xl" style="background:#F0FDFA;"><p class="text-2xl font-bold" style="color:var(--teal);">4</p><p class="text-xs text-gray-500">Core Projects</p></div>
+          <div class="text-center px-4 py-3 rounded-xl" style="background:#FFFBEB;"><p class="text-2xl font-bold" style="color:#D97706;">100%</p><p class="text-xs text-gray-500">Volunteer-led</p></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- About Section -->
-  <section class="py-12 bg-gray-100">
-    <div class="container mx-auto px-4 md:w-2/3 text-center">
-      <h2 class="text-3xl font-bold mb-4 text-blue-700">Who We Are</h2>
-      <p class="mb-6 text-gray-700">
-        Since 2019, Smiling Faces Empowerment Initiative has empowered youth, supported displaced persons, planted trees, and impacted thousands through outreach and service projects across Nigeria.
-      </p>
-      <a href="#" class="inline-block text-blue-600 font-medium hover:underline">Learn More →</a>
+  <!-- CORE PROJECTS -->
+  <section id="projects" class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-14">
+        <p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color:var(--teal);">What We Do</p>
+        <h2 class="text-4xl font-bold" style="color:var(--blue);">Our Core Projects</h2>
+      </div>
+      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"><div class="h-3" style="background:var(--gold);"></div><div class="p-6"><div class="text-4xl mb-4"></div><h3 class="text-xl font-bold mb-2" style="color:var(--blue);">Feed the Needy</h3><p class="text-gray-600 text-sm leading-relaxed mb-4">Providing hot nutritious meals to displaced persons, orphans, and vulnerable families across IDP camps and communities.</p><p class="text-sm font-medium" style="color:var(--gold);">5,000+ meals served</p></div></div>
+        <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"><div class="h-3" style="background:var(--teal);"></div><div class="p-6"><div class="text-4xl mb-4"></div><h3 class="text-xl font-bold mb-2" style="color:var(--blue);">Green Legacy</h3><p class="text-gray-600 text-sm leading-relaxed mb-4">Partnering with schools and communities to plant trees, promote environmental awareness, and build a greener Nigeria.</p><p class="text-sm font-medium" style="color:var(--teal);">800+ trees planted</p></div></div>
+        <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"><div class="h-3" style="background:#3B82F6;"></div><div class="p-6"><div class="text-4xl mb-4"></div><h3 class="text-xl font-bold mb-2" style="color:var(--blue);">Water Drive</h3><p class="text-gray-600 text-sm leading-relaxed mb-4">Bringing clean, safe drinking water to communities that lack access — because clean water is a basic human right.</p><p class="text-sm font-medium" style="color:#3B82F6;">Multiple communities reached</p></div></div>
+        <div class="project-card bg-white rounded-2xl shadow-md overflow-hidden"><div class="h-3" style="background:#8B5CF6;"></div><div class="p-6"><div class="text-4xl mb-4"></div><h3 class="text-xl font-bold mb-2" style="color:var(--blue);">Disability Support</h3><p class="text-gray-600 text-sm leading-relaxed mb-4">Supporting persons with disabilities through visits, resources, advocacy, and partnerships with disability schools across Nigeria.</p><p class="text-sm font-medium" style="color:#8B5CF6;">Sokoto, Abuja & beyond</p></div></div>
+      </div>
     </div>
   </section>
 
-  <!-- Recent Projects -->
-  <section class="py-12 bg-white">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold mb-8 text-center text-blue-700">Our Work in Action</h2>
+  <!-- SLIDING GALLERY -->
+  <section id="work" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-12">
+        <p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color:var(--teal);">Gallery</p>
+        <h2 class="text-4xl font-bold" style="color:var(--blue);">Our Work in Action</h2>
+      </div>
+      <div class="slider-wrapper">
+        <div class="slider-track" id="sliderTrack">
+
+          <div class="slide-card">
+            <div class="project-card bg-gray-50 rounded-2xl shadow overflow-hidden h-full">
+              <img src="images/IMG_2.JPG" alt="Disability School" class="w-full h-52 object-cover">
+              <div class="p-5"><span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#EFF6FF;color:var(--blue);">Disability Support</span><h3 class="text-lg font-bold mt-3 mb-1" style="color:var(--blue);">Supporting Schools for Children with Disabilities</h3><p class="text-gray-500 text-xs mb-2">June 2024 • Sokoto</p><p class="text-gray-600 text-sm mb-3">We provided resources and support to children with disabilities in Sokoto State.</p><a href="#" class="text-sm font-semibold" style="color:var(--teal);">View Project →</a></div>
+            </div>
+          </div>
+
+          <div class="slide-card">
+            <div class="project-card bg-gray-50 rounded-2xl shadow overflow-hidden h-full">
+              <img src="images/IMG_1289.JPG" alt="PWD Camp" class="w-full h-52 object-cover">
+              <div class="p-5"><span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#F0FDFA;color:var(--teal);">Disability Support</span><h3 class="text-lg font-bold mt-3 mb-1" style="color:var(--blue);">Visit to People with Disabilities Camp</h3><p class="text-gray-500 text-xs mb-2">April 2024 • Abuja</p><p class="text-gray-600 text-sm mb-3">SFEI team visited and uplifted persons with disabilities in the FCT.</p><a href="#" class="text-sm font-semibold" style="color:var(--teal);">View Project →</a></div>
+            </div>
+          </div>
+
+          <div class="slide-card">
+            <div class="project-card bg-gray-50 rounded-2xl shadow overflow-hidden h-full">
+              <img src="images/IMG_1288.JPG" alt="Orphanage" class="w-full h-52 object-cover">
+              <div class="p-5"><span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#FFFBEB;color:#D97706;">Feed the Needy</span><h3 class="text-lg font-bold mt-3 mb-1" style="color:var(--blue);">Orphanage Visit – Abuja</h3><p class="text-gray-500 text-xs mb-2">February 2024 • Abuja</p><p class="text-gray-600 text-sm mb-3">We brought gifts, smiles, and support to over 100 children at the Hope Orphanage.</p><a href="#" class="text-sm font-semibold" style="color:var(--teal);">View Project →</a></div>
+            </div>
+          </div>
+
+          <div class="slide-card">
+            <div class="project-card bg-gray-50 rounded-2xl shadow overflow-hidden h-full">
+              <div class="w-full h-52 flex items-center justify-center text-7xl" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">🌳</div>
+              <div class="p-5"><span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#ECFDF5;color:#059669;">Green Legacy</span><h3 class="text-lg font-bold mt-3 mb-1" style="color:var(--blue);">Tree Planting at Stargate Academy – Kubwa</h3><p class="text-gray-500 text-xs mb-2">2024 • Kubwa, Abuja</p><p class="text-gray-600 text-sm mb-3">SFEI partnered with Stargate Academy Kubwa, planting trees and teaching students to become environmental champions.</p><a href="#" class="text-sm font-semibold" style="color:var(--teal);">View Project →</a></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- Controls -->
+      <div class="flex items-center justify-center gap-4 mt-8">
+        <button onclick="slideLeft()" class="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xl font-bold transition hover:text-white hover:bg-blue-800" style="border-color:var(--blue);color:var(--blue);">‹</button>
+        <div class="flex gap-2" id="dots"></div>
+        <button onclick="slideRight()" class="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xl font-bold transition hover:text-white hover:bg-blue-800" style="border-color:var(--blue);color:var(--blue);">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2025 TIMELINE -->
+  <section id="timeline" class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-14">
+        <p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color:var(--teal);">What's Coming</p>
+        <h2 class="text-4xl font-bold" style="color:var(--blue);">2025 Project Roadmap</h2>
+        <p class="text-gray-500 mt-3 max-w-xl mx-auto">Our plan for the year — four quarters, four life-changing projects.</p>
+      </div>
+      <div class="max-w-2xl mx-auto">
+
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#FFFBEB;border:3px solid var(--gold);">🍽️</div>
+          <div class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+              <h3 class="text-xl font-bold" style="color:var(--blue);">Feed the Needy</h3>
+              <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#FFFBEB;color:#D97706;">Jan – Mar 2025</span>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed">Kicking off the year by providing hot meals and food packages to displaced persons, orphanages, and vulnerable families across Abuja and beyond.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#ECFDF5;border:3px solid var(--teal);">🌱</div>
+          <div class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+              <h3 class="text-xl font-bold" style="color:var(--blue);">Green Legacy</h3>
+              <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#ECFDF5;color:#059669;">Apr – Jun 2025</span>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed">Tree planting drives in schools and communities. Building environmental awareness and leaving a lasting green footprint for future generations.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#F5F3FF;border:3px solid #8B5CF6;">🤝</div>
+          <div class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+              <h3 class="text-xl font-bold" style="color:var(--blue);">Different Abilities Project</h3>
+              <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#F5F3FF;color:#8B5CF6;">Jul – Sep 2025</span>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed">Visiting, empowering, and advocating for persons with disabilities — through resource donations, school partnerships, and community awareness campaigns.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#EFF6FF;border:3px solid #3B82F6;">💧</div>
+          <div class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+              <h3 class="text-xl font-bold" style="color:var(--blue);">Water Drive</h3>
+              <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#EFF6FF;color:#3B82F6;">Oct – Dec 2025</span>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed">Closing the year strong by delivering clean, safe water access to underserved communities. Because every person deserves to drink clean water.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- GET INVOLVED -->
+  <section id="get-involved" class="py-20" style="background:linear-gradient(135deg,#1E3A8A 0%,#14B8A6 100%);">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-2 text-teal-200">Join the Movement</p>
+      <h2 class="text-4xl font-bold text-white mb-4">Get Involved</h2>
+      <p class="text-blue-100 mb-12 max-w-xl mx-auto">There are many ways to be part of the change. Pick what works for you.</p>
       <div class="grid gap-8 md:grid-cols-3">
-        <!-- Project Card -->
-        <div class="bg-gray-100 rounded shadow p-4">
-          <img src="images/IMG_2.JPG" alt="" class="w-full h-48 object-cover rounded mb-4">
-          <h3 class="text-xl font-semibold">Supporting schools for children with disabilities - Sokoto</h3>
-          <p class="text-gray-600 text-sm mb-2">June 2024</p>
-          <p class="text-gray-700 mb-2">We provided hot meals to over 300 displaced individuals in the Kubwa IDP camp.</p>
-          <a href="#" class="text-blue-600 hover:underline">View Project →</a>
-        </div>
-        <!-- Project Card -->
-        <div class="bg-gray-100 rounded shadow p-4">
-          <img src="images/IMG_1289.JPG" alt="" class="w-full h-48 object-cover rounded mb-4">
-          <h3 class="text-xl font-semibold">Visit to People with Disabilities Camp - Abuja</h3>
-          <p class="text-gray-600 text-sm mb-2">April 2024</p>
-          <p class="text-gray-700 mb-2">SFEI partnered with local schools to plant 400+ trees for environmental awareness.</p>
-          <a href="#" class="text-blue-600 hover:underline">View Project →</a>
-        </div>
-        <!-- Project Card -->
-        <div class="bg-gray-100 rounded shadow p-4">
-          <img src="images/IMG_1288.JPG" alt="" class="w-full h-48 object-cover rounded mb-4">
-          <h3 class="text-xl font-semibold">Orphanage Visit – Abuja</h3>
-          <p class="text-gray-600 text-sm mb-2">February 2024</p>
-          <p class="text-gray-700 mb-2">We brought gifts, smiles, and support to over 100 children at the Hope Orphanage.</p>
-          <a href="#" class="text-blue-600 hover:underline">View Project →</a>
-        </div>
-      </div>
-      <div class="text-center mt-6">
-        <a href="#" class="text-blue-700 font-medium hover:underline">View All Projects →</a>
+        <div class="bg-white/10 backdrop-blur rounded-2xl p-8 text-white hover:bg-white/20 transition"><div class="text-5xl mb-4"></div><h3 class="text-xl font-bold mb-2">Volunteer</h3><p class="text-blue-100 text-sm mb-4">Join our next outreach or help us plan events that change lives.</p><a href="#contact" class="inline-block px-5 py-2 rounded-full text-sm font-semibold" style="background:var(--gold);color:#1E3A8A;">Sign Up</a></div>
+        <div class="bg-white/10 backdrop-blur rounded-2xl p-8 text-white hover:bg-white/20 transition"><div class="text-5xl mb-4"></div><h3 class="text-xl font-bold mb-2">Partner With Us</h3><p class="text-blue-100 text-sm mb-4">Let's work together to reach more communities and multiply impact.</p><a href="#contact" class="inline-block px-5 py-2 rounded-full text-sm font-semibold" style="background:var(--gold);color:#1E3A8A;">Reach Out</a></div>
+        <div class="bg-white/10 backdrop-blur rounded-2xl p-8 text-white hover:bg-white/20 transition"><div class="text-5xl mb-4"></div><h3 class="text-xl font-bold mb-2">Donate</h3><p class="text-blue-100 text-sm mb-4">Support our mission with a one-time or recurring gift. Every naira counts.</p><button onclick="toggleDonatePopup()" class="px-5 py-2 rounded-full text-sm font-semibold" style="background:var(--gold);color:#1E3A8A;">Donate Now</button></div>
       </div>
     </div>
   </section>
 
-  <!-- Get Involved -->
-  <section class="py-12 bg-blue-50">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold mb-6 text-blue-800">Get Involved</h2>
-      <div class="grid gap-6 md:grid-cols-3">
-        <div>
-          <div class="text-5xl mb-2"></div>
-          <h3 class="text-xl font-semibold">Volunteer</h3>
-          <p class="text-gray-700 mb-2">Join our next outreach or help us plan events.</p>
-          <a href="#" class="text-blue-600 hover:underline">Sign Up</a>
+  <!-- CONTACT -->
+  <section id="contact" class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-14">
+        <p class="text-sm font-semibold uppercase tracking-widest mb-2" style="color:var(--teal);">Reach Us</p>
+        <h2 class="text-4xl font-bold" style="color:var(--blue);">Contact Us</h2>
+        <p class="text-gray-500 mt-3">We'd love to hear from you — for partnerships, volunteering, or just to say hello.</p>
+      </div>
+      <div class="flex flex-col md:flex-row gap-12 max-w-5xl mx-auto">
+        <div class="md:w-1/2 space-y-6">
+          <div class="flex gap-4 items-start"><div class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0" style="background:var(--blue);">📍</div><div><h4 class="font-semibold">Address</h4><p class="text-gray-500 text-sm">Abuja, Federal Capital Territory, Nigeria</p></div></div>
+          <div class="flex gap-4 items-start"><div class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0" style="background:var(--teal);">📧</div><div><h4 class="font-semibold">Email</h4><p class="text-gray-500 text-sm">info@smilingfacesng.org</p></div></div>
+          <div class="flex gap-4 items-start"><div class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0" style="background:var(--gold);">📞</div><div><h4 class="font-semibold">Phone</h4><p class="text-gray-500 text-sm">+234 800 000 0000</p></div></div>
+          <div class="flex gap-4 items-start"><div class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0" style="background:#E1306C;">📱</div><div><h4 class="font-semibold">Social Media</h4><div class="flex gap-3 mt-1"><a href="#" class="text-sm font-medium hover:underline" style="color:var(--blue);">Facebook</a><a href="#" class="text-sm font-medium hover:underline" style="color:#E1306C;">Instagram</a><a href="#" class="text-sm font-medium hover:underline" style="color:#1DA1F2;">Twitter</a></div></div></div>
         </div>
-        <div>
-          <div class="text-5xl mb-2"></div>
-          <h3 class="text-xl font-semibold">Partner</h3>
-          <p class="text-gray-700 mb-2">Let's work together to reach more communities.</p>
-          <a href="#" class="text-blue-600 hover:underline">Become a Partner</a>
-        </div>
-        <div>
-          <div class="text-5xl mb-2"></div>
-          <h3 class="text-xl font-semibold">Donate</h3>
-          <p class="text-gray-700 mb-2">Support our mission with a one-time or recurring gift.</p>
-          <a href="#" class="text-blue-600 hover:underline">Donate Now</a>
+        <div class="md:w-1/2">
+          <div class="bg-gray-50 rounded-2xl p-8 shadow-sm space-y-4">
+            <div class="flex gap-4"><input type="text" placeholder="Your Name" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"><input type="email" placeholder="Email Address" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"></div>
+            <input type="text" placeholder="Subject" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <textarea placeholder="Your Message..." rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"></textarea>
+            <button class="w-full py-3 rounded-full text-white font-semibold text-sm transition hover:opacity-90" style="background:var(--blue);">Send Message</button>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="bg-white py-8 border-t mt-8">
-    <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm">
-      <div class="mb-4 md:mb-0">
-        <p class="text-gray-600">© 2025 Smiling Faces Empowerment Initiative</p>
+  <!-- FOOTER -->
+  <footer style="background:var(--blue);" class="text-white pt-14 pb-6">
+    <div class="container mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-10 mb-10">
+        <div class="md:col-span-2">
+          <h3 class="text-xl font-bold mb-3" style="color:var(--gold);">Smiling Faces Empowerment Initiative</h3>
+          <p class="text-blue-200 text-sm leading-relaxed mb-4">Bridging donors and the needy through impactful community programs across Nigeria since 2019.</p>
+          <button onclick="toggleDonatePopup()" class="px-6 py-2 rounded-full text-sm font-semibold" style="background:var(--gold);color:#1E3A8A;">Donate Now</button>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-4" style="color:var(--gold);">Our Projects</h4>
+          <ul class="space-y-2 text-blue-200 text-sm"><li> Feed the Needy</li><li> Green Legacy</li><li> Water Drive</li><li>Disability Support</li></ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-4" style="color:var(--gold);">Quick Links</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#home" class="text-blue-200 hover:text-white">Home</a></li>
+            <li><a href="#about" class="text-blue-200 hover:text-white">About Us</a></li>
+            <li><a href="#projects" class="text-blue-200 hover:text-white">Projects</a></li>
+            <li><a href="team.html" class="text-blue-200 hover:text-white">Our Team</a></li>
+            <li><a href="#timeline" class="text-blue-200 hover:text-white">2025 Roadmap</a></li>
+            <li><a href="#contact" class="text-blue-200 hover:text-white">Contact</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="space-x-4">
-        <a href="#" class="text-gray-500 hover:text-blue-600">Facebook</a>
-        <a href="#" class="text-gray-500 hover:text-blue-600">Instagram</a>
-        <a href="#" class="text-gray-500 hover:text-blue-600">Contact</a>
+      <div class="border-t border-blue-700 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-blue-300 gap-4">
+        <p>© 2025 Smiling Faces Empowerment Initiative. All rights reserved.</p>
+        <div class="flex gap-5"><a href="#" class="hover:text-white transition">Facebook</a><a href="#" class="hover:text-white transition">Instagram</a><a href="#" class="hover:text-white transition">Twitter</a></div>
       </div>
     </div>
   </footer>
 
+  <!-- FLOATING DONATE BUBBLE -->
+  <button class="donate-bubble-btn" onclick="toggleDonatePopup()"> Donate Now</button>
+
+  <!-- Donate Popup -->
+  <div class="donate-popup" id="donatePopup">
+    <div class="p-4 text-white" style="background:linear-gradient(135deg,#1E3A8A,#14B8A6);">
+      <div class="flex justify-between items-center">
+        <div><p class="font-bold"> Support SFEI</p><p class="text-blue-100 text-xs">Your donation changes lives</p></div>
+        <button onclick="toggleDonatePopup()" class="text-white opacity-70 hover:opacity-100 text-xl">✕</button>
+      </div>
+    </div>
+    <div class="p-5">
+      <div class="rounded-xl p-4 space-y-3 mb-4" style="background:#F0F9FF;border:2px solid #DBEAFE;">
+        <div class="flex justify-between items-center"><span class="text-xs text-gray-500 uppercase tracking-wide">Bank</span><span class="font-semibold text-gray-800 text-sm">First City Monument Bank</span></div>
+        <div class="border-t border-blue-100"></div>
+        <div class="flex justify-between items-start"><span class="text-xs text-gray-500 uppercase tracking-wide">Account Name</span><span class="font-semibold text-gray-800 text-xs text-right max-w-[170px]">Smiling Faces Initiative</span></div>
+        <div class="border-t border-blue-100"></div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500 uppercase tracking-wide">Account No.</span>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-base" id="accNumber" style="color:var(--blue);">7145696010</span>
+            <button onclick="copyAccount()" class="text-xs px-2 py-1 rounded font-semibold" style="background:var(--gold);color:#1E3A8A;">Copy</button>
+          </div>
+        </div>
+      </div>
+      <p id="copyMsg" class="text-center text-xs text-green-600 mb-2 hidden">Copied to clipboard!</p>
+      <p class="text-center text-xs text-gray-400">Send proof to <span class="font-medium" style="color:var(--blue);">info@smilingfacesng.org</span></p>
+    </div>
+  </div>
+
+  <script>
+    // DONATE POPUP
+    function toggleDonatePopup() { document.getElementById('donatePopup').classList.toggle('open'); }
+    document.addEventListener('click', function(e) {
+      const popup = document.getElementById('donatePopup');
+      if (popup.classList.contains('open') && !popup.contains(e.target) && !e.target.closest('.donate-bubble-btn')) {
+        popup.classList.remove('open');
+      }
+    });
+    function copyAccount() {
+      navigator.clipboard.writeText(document.getElementById('accNumber').textContent).then(() => {
+        const msg = document.getElementById('copyMsg');
+        msg.classList.remove('hidden');
+        setTimeout(() => msg.classList.add('hidden'), 2500);
+      });
+    }
+
+    // MOBILE MENU
+    function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
+
+    // SLIDER
+    let currentSlide = 0;
+    let autoSlide;
+    const track = document.getElementById('sliderTrack');
+    const cards = Array.from(track.querySelectorAll('.slide-card'));
+    const dotsContainer = document.getElementById('dots');
+
+    function getVisible() {
+      if (window.innerWidth < 768) return 1;
+      if (window.innerWidth < 1024) return 2;
+      return 3;
+    }
+
+    function getTotalSlides() { return Math.max(1, cards.length - getVisible() + 1); }
+
+    function buildDots() {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < getTotalSlides(); i++) {
+        const dot = document.createElement('button');
+        dot.style.cssText = `height:10px;border-radius:9999px;border:none;cursor:pointer;transition:all 0.3s;background:${i===currentSlide?'#1E3A8A':'#CBD5E1'};width:${i===currentSlide?'1.5rem':'0.625rem'}`;
+        dot.onclick = () => goToSlide(i);
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    function updateDots() {
+      Array.from(dotsContainer.children).forEach((d, i) => {
+        d.style.background = i === currentSlide ? '#1E3A8A' : '#CBD5E1';
+        d.style.width = i === currentSlide ? '1.5rem' : '0.625rem';
+      });
+    }
+
+    function goToSlide(n) {
+      currentSlide = Math.max(0, Math.min(n, getTotalSlides() - 1));
+      const gap = 24;
+      const cardW = cards[0].offsetWidth + gap;
+      track.style.transform = `translateX(-${currentSlide * cardW}px)`;
+      updateDots();
+    }
+
+    function slideRight() {
+      goToSlide(currentSlide >= getTotalSlides() - 1 ? 0 : currentSlide + 1);
+    }
+    function slideLeft() {
+      goToSlide(currentSlide <= 0 ? getTotalSlides() - 1 : currentSlide - 1);
+    }
+
+    function startAutoSlide() {
+      clearInterval(autoSlide);
+      autoSlide = setInterval(slideRight, 4000);
+    }
+
+    buildDots();
+    startAutoSlide();
+    window.addEventListener('resize', () => { buildDots(); goToSlide(0); });
+  </script>
 </body>
 </html>
